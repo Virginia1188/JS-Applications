@@ -1,8 +1,8 @@
 import { html } from '../lib.js';
-import { deleteBook, getBookById } from '../data/books.js';
+import { deleteBook, getAllLikes, getBookById, getUseerLikes, sendLikes } from '../data/books.js';
 import { getUserData } from '../utils.js';
 
-const detailsTemplate = (book, onDelete) => html`
+const detailsTemplate = (book,userLikes, allLikes, onDelete,onLike) => html`
 <section id="details-page" class="details">
     <div class="book-information">
         <h3>${book.title}</h3>
@@ -14,12 +14,12 @@ const detailsTemplate = (book, onDelete) => html`
                 <a class="button" href="/home/${book._id}/edit">Edit</a>
                 <a class="button" @click=${onDelete} href="javascript:void(0)">Delete</a>` : null}
 
-            ${book.canLike ? html`
-                <a class="button" href="/like">Like</a>` : null}
+            ${book.canLike && userLikes == 0 ? html`
+                <a class="button" @click=${onLike} href="javascript:void(0)">Like</a>` : null}
 
             <div class="likes">
                 <img class="hearts" src="/images/heart.png">
-                <span id="total-likes">Likes: 0</span>
+                <span id="total-likes">Likes: ${allLikes}</span>
             </div>
         </div>
     </div>
@@ -35,9 +35,13 @@ export async function detailsPage(ctx) {
     const id = ctx.params.id;
     const userData = getUserData();
     const book = await getBookById(id);
-    console.log(book);
-    console.log(id);
+    let allLikes = await getAllLikes(id);
 
+    let userLikes;
+
+    if (userData){
+        userLikes = await getUseerLikes(id, userData._id);
+    }
     if(userData && userData._id == book._ownerId){
         book.canEdit = true;
     }
@@ -46,8 +50,11 @@ export async function detailsPage(ctx) {
         book.canLike = true;
     }
 
-
-    ctx.render(detailsTemplate(book, onDelete));
+    update(userLikes, allLikes);
+    function update(userLikes, allLikes){
+ 
+        ctx.render(detailsTemplate(book,userLikes,allLikes, onDelete,onLike));
+    }
 
     async function onDelete(){
         const choice = confirm('Are you sure?');
@@ -55,5 +62,16 @@ export async function detailsPage(ctx) {
             await deleteBook(id);
             ctx.page.redirect('/');
         }
+    }
+
+    async function onLike(){
+
+        const result = await sendLikes(id);
+        allLikes = await getAllLikes(id);
+        userLikes = await getUseerLikes(id, userData._id);
+      
+        // console.log(allLikes);
+        update(userLikes,allLikes);
+        ctx.page.redirect(`/home/${id}`);
     }
 }
