@@ -21,13 +21,12 @@ const productTemplate = (product) => html`
     <h2 class="post-title">${product.title}</h2>
     <img class="post-image" src=${product.imageUrl} alt="Material Image">
     <div class="btn-wrapper">
-        <a href="/${product._id}" class="details-btn btn">Details</a>
+        <a href="/details/${product._id}" class="details-btn btn">Details</a>
     </div>
 </div>
 `;
 
 export async function productsPage(ctx) {
     const products = await getAll();
-    console.log(products);
     ctx.render(productsTemplate(products));
 }

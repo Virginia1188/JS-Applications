@@ -2,7 +2,7 @@ import { deleteProduct, getAllDonations, getById, sendDonations, userDonate} fro
 import { html } from '../lib.js';
 import { getUserData } from '../utils.js';
 
-// TODO add actual view
+
 const detailsTemplate = (product, onDelete,onDonate,allDonations,hasDonated) => html`
 <section id="details-page">
     <h1 class="title">Post Details</h1>
@@ -21,7 +21,7 @@ const detailsTemplate = (product, onDelete,onDonate,allDonations,hasDonated) => 
 
                 <div class="btns">
                     ${product.canEdit ? html`
-                    <a href="/${product._id}/edit" class="edit-btn btn">Edit</a>
+                    <a href="/edit/${product._id}" class="edit-btn btn">Edit</a>
                     <a @click=${onDelete} href="javascript:void(0)" class="delete-btn btn">Delete</a>` : null}
                     
                     ${product.canDonate && hasDonated == 0 ? 
@@ -40,10 +40,11 @@ export async function detailsPage(ctx) {
     const userData = await getUserData();
     const product = await getById(id);
     let allDonations = await getAllDonations(id);
-    let hasDonated = await userDonate(id, userData._id);
+    let hasDonated;
    
     
     if (userData) {
+        hasDonated = await userDonate(id, userData._id);
         if (userData._id === product._ownerId) {
             product.canEdit = true;  
         }else if(userData._id != product._ownerId){
@@ -64,9 +65,10 @@ export async function detailsPage(ctx) {
     }
 
     async function onDonate(){
-        const result = await sendDonations(id);
+         await sendDonations(id);
         hasDonated = await userDonate(id, userData._id);
-        update(hasDonated);
+        allDonations = await getAllDonations(id);
+        update(allDonations,hasDonated);
         ctx.page.redirect(`/${id}`);
     }
 }

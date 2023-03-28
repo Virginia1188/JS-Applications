@@ -9,7 +9,7 @@ import { logout } from './data/auth.js';
 import { createPage } from './views/create.js';
 import { detailsPage } from './views/details.js';
 import { editPage } from './views/edit.js';
-import { userPage } from './views/userPage.js';
+import { userPage } from './views/my-posts.js';
 
 
 const root = document.getElementById('box');
@@ -22,9 +22,9 @@ page('/login',loginPage);
 page('/register', registerPage);
 page('/logout',logoutAction);
 page('/create', createPage);
-page('/:id', detailsPage);
-page('/:id/edit', editPage);
-page('/posts', userPage);
+page('/details/:id', detailsPage);
+page('/edit/:id', editPage);
+page('/my-posts', userPage);
 page.start();
 
 function decorateContext(ctx, next){
