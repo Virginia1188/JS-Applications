@@ -1,6 +1,6 @@
 import { html } from '../../../../../node_modules/lit-html/lit-html.js';
 import { login } from '../data/auth.js';
-import { createSubmitHandler } from '../utils.js';
+import { alertMessage, createSubmitHandler } from '../utils.js';
 
 // TODO change with actual view
 
@@ -27,6 +27,10 @@ export function loginPage(ctx) {
     ctx.render(loginTemplate(createSubmitHandler(onLogin)));
 
     async function onLogin({ email, password }, form) {
+        if(email == '' || password == '' ){
+            alertMessage('All fields are required');
+            return;
+        }
         await login(email, password);
         form.reset();
         ctx.page.redirect('/allmemes');

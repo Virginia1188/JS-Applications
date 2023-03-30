@@ -1,6 +1,6 @@
 import { createMeme } from '../data/memes.js';
 import { html } from '../lib.js';
-import { createSubmitHandler } from '../utils.js';
+import { alertMessage, createSubmitHandler } from '../utils.js';
 
 const createTemplate = (onCreate) => html`
 <section id="create-meme">
@@ -26,7 +26,8 @@ export function createPage(ctx) {
     async function onCreate({ title, description, imageUrl }, form) {
 
         if(title == ''|| description =='' || imageUrl =='' ){
-            return alert('All fields are required');
+            alertMessage('All fields are required');
+            return;
         }
 
         await createMeme(title, description, imageUrl);

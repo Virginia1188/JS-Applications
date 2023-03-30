@@ -1,6 +1,6 @@
 import { html } from '../../../../../node_modules/lit-html/lit-html.js';
 import {  register } from '../data/auth.js';
-import { createSubmitHandler } from '../utils.js';
+import { alertMessage, createSubmitHandler } from '../utils.js';
 
 // TODO change with actual view
 
@@ -37,11 +37,13 @@ export function registerPage(ctx) {
 
     async function onRegister({username, email, password , ['repeatPass']: repass, gender}, form) {
         if(email == '' || password == '' || gender == '' || username == '' ){
-            return alert('All fields are required');
+            alertMessage('All fields are required');
+            return;
         }
 
         if(password != repass){
-            return alert('Passwords don\'t match');
+            alertMessage('Passwords don\'t match');
+            return;
         }
         
         await register(username, email, password, gender);

@@ -22,3 +22,14 @@ export function createSubmitHandler(callback){
         callback(data,form);
     };
 }
+
+export function alertMessage(message) {
+    const notification = document.querySelector('.notification');
+    const alertText = notification.querySelector('span');
+    notification.style.display = 'block';
+    alertText.textContent = message;
+    
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 3000);
+}
