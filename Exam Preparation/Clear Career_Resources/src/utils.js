@@ -5,7 +5,7 @@ export function getUserData(){
 }
 
 export function setUserData(data){
-    localStorage.setItem(itemName, JSON.stringify(data));
+    return localStorage.setItem(itemName, JSON.stringify(data));
 }
 
 export function clearUserData(){

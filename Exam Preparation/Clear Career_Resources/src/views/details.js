@@ -1,109 +1,82 @@
-// import { getApplications, getUserApplication } from '../data/applications.js';
-import { deleteOffer, getById } from '../data/offers.js';
+import { deleteData, getAllApplications, getById, getUserApplication, sendApplication } from '../data/data.js';
 import { html } from '../lib.js';
 import { getUserData } from '../utils.js';
 
-const detailsTemplate = (offer,onDelete)=>html`
+
+const detailsTemplate = (product, onDelete, onApply, allApplications) => html`
 <section id="details">
     <div id="details-wrapper">
-    <img id="details-img" src=${offer.imageUrl} alt="example1" />
-    <p id="details-title">${offer.title}</p>
-    <p id="details-category">
-        Category: <span id="categories">${offer.category}</span>
-    </p>
-    <p id="details-salary">
-        Salary: <span id="salary-number">${offer.salary}</span>
-    </p>
-    <div id="info-wrapper">
-        <div id="details-description">
-        <h4>Description</h4>
-        <span>${offer.description}</span>
+        <img id="details-img" src=${product.imageUrl} alt="example1" />
+        <p id="details-title">${product.title}</p>
+        <p id="details-category">
+            Category: <span id="categories">${product.category}</span>
+        </p>
+        <p id="details-salary">
+            Salary: <span id="salary-number">${product.salary}</span>
+        </p>
+        <div id="info-wrapper">
+            <div id="details-description">
+                <h4>Description</h4>
+                <span>${product.description}</span>
+            </div>
+            <div id="details-requirements">
+                <h4>Requirements</h4>
+                <span>${product.requirements}</span>
+            </div>
         </div>
-        <div id="details-requirements">
-        <h4>Requirements</h4>
-        <span>${offer.requirements}</span>
-        </div>
-    </div>
-    <p>Applications: <strong id="applications">0</strong></p>
+        <p>Applications: <strong id="applications">${allApplications}</strong></p>
 
-    ${offer.canEdit ? html`
+        <!--Edit and Delete are only for creator-->
         <div id="action-buttons">
+            ${product.canEdit ? 
+            html`
+            <a href="/edit/${product._id}" id="edit-btn">Edit</a>
+            <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>` : null}
+            
 
-        <a href="/dashboard/${offer._id}/edit" id="edit-btn">Edit</a>
-        <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>
-
-        <a href="" id="apply-btn">Apply</a>` : null}
-
-    <!-- ${offer.canEdit || offer.canApply ? html`
-    <div id="action-buttons">
-
-        ${offer.canEdit ? html`
-        <a href="/dashboard/${offer._id}/edit" id="edit-btn">Edit</a>
-        <a @click=${onDelete} href="javascript:void(0)" id="delete-btn">Delete</a>` : null}
-        
-        ${offer.canApply ? html`
-        <a href="" id="apply-btn">Apply</a>` : null}
-    </div> ` : null} -->
-    
-    </div> 
+            <!--Bonus - Only for logged-in users ( not authors )-->
+            ${product.canApply ? html`
+            <a @click=${onApply} href="javascript:void(0)" id="apply-btn">Apply</a>` : null}
+           
+        </div>
     </div>
 </section>
 `;
 
-
-export async function detailsPage(ctx){
+export async function detailsPage(ctx) {
     const id = ctx.params.id;
-    
-    const offer = await getById(id);
-    const userData = getUserData();
 
-    if(userData && userData._id == offer._ownerId){
-        offer.canEdit = true;
+    const userData = await getUserData();
+    const product = await getById(id);
+    const allApplications = await getAllApplications(id);
+    const userApplication = await getUserApplication(id, userData._id);
+
+
+    if (userData) {
+        if (userData._id === product._ownerId) {
+            product.canEdit = true;
+        } 
+
+        if(userData._id != product._ownerId && userApplication == 0){
+            product.canApply = true;
+        }
     }
+    ctx.render(detailsTemplate(product, onDelete, onApply, allApplications));
 
-    ctx.render(detailsTemplate(offer,onDelete));
-
-    async function onDelete(){
+    async function onDelete() {
         const choice = confirm('Are you sure?');
-        if(choice){
-            await deleteOffer(id);
+        if (choice) {
+            await deleteData(id);
             ctx.page.redirect('/dashboard');
         }
     }
+
+    async function onApply(){
+        const send = await sendApplication(id);
+        const updateCount = await getAllApplications(id);
+        ctx.render(detailsTemplate(product, onDelete, onApply, updateCount));
+        ctx.page.redirect(`/details/${id}`);
+    }
+
+
 }
-
-
-
-// export async function detailsPage(ctx){
-//     const id = ctx.params.id;
-//     // requesting data for applications
-//     const requests = [
-//         getById(id),
-//         getApplications(id),
-//     ];
-//     const userData = getUserData();
-
-//     if(userData){
-//         requests.push(getUserApplication(id,userData._id));
-//         console.log(userData._id);
-//     }
-
-//     const [offer, applications,hasApplied] = await Promise.all(requests);
-//     offer.applications = applications;
-
-//     // 
-//     if(userData) {
-//         offer.canEdit = userData._id == offer._ownerId; // returns boolean
-//         offer.canApply = offer.canEdit == false && hasApplied == 0; //if zero the current user doesn't have applications for this offer
-//     }
-
-//     ctx.render(detailsTemplate(offer,onDelete));
-
-//     async function onDelete(){
-//         const choice = confirm('Are you sure?');
-//         if(choice){
-//             await deleteOffer(id);
-//             ctx.page.redirect('/dashboard');
-//         }
-//     }
-// }

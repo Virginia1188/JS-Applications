@@ -7,6 +7,7 @@ const endpoints = {
     logout: '/users/logout',
 };
 
+// TODO change user object according to project requirments 
 
 export async function login(email, password) {
     const result = await post(endpoints.login, { email, password });

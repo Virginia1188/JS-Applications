@@ -1,30 +1,33 @@
-import { get } from '../data/api.js';
-import { getAllOffers } from '../data/offers.js';
 import { html } from '../lib.js';
+import { getAll } from '../data/data.js';
 
+// TODO replace with actual view
 
-const dashboardTemplate = (offers)=>html`
+const productsTemplate = (products) => html`
 <section id="dashboard">
     <h2>Job Offers</h2>
-    ${offers.length > 0 ? offers.map(offerTemplate)
-    : html`<h2>No offers yet.</h2>`}
+
+    ${products.length > 0 ? 
+    html`${products.map(productTemplate)}` :
+    html`<h2>No offers yet.</h2>`}
+    
 </section>
+
 `;
 
-const offerTemplate = (offer)=>html`
-    <div class="offer">
-    <img src=${offer.imageUrl} alt="./images/example3.png" />
+const productTemplate = (product) => html`
+<div class="offer">
+    <img src=${product.imageUrl} alt="./images/example3.png" />
     <p>
-        <strong>Title: </strong
-        ><span class="title">${offer.title}</span>
+        <strong>Title: </strong><span class="title">${product.title}</span>
     </p>
-    <p><strong>Salary:</strong><span class="salary">${offer.salary}</span></p>
-    <a class="details-btn" href="/dashboard/${offer._id}">Details</a>
-    </div>
+    <p><strong>Salary:</strong><span class="salary">${product.salary}</span></p>
+    <a class="details-btn" href="/details/${product._id}">Details</a>
+</div>
 `;
 
-
-export async function dashboardPage(ctx){
-    const offers = await getAllOffers();
-    ctx.render(dashboardTemplate(offers));
-};
+export async function productsPage(ctx) {
+    const products = await getAll();
+    console.log(products);
+    ctx.render(productsTemplate(products));
+}
