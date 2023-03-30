@@ -35,6 +35,7 @@ const myCarTemplate = (car)=> html`
 export async function myListingsPage(ctx) {
     const userData = await getUserData();
     const myCars = await myListings(userData._id);
+    console.log(myCars);
 
     ctx.render(myListingsTemplate(myCars));
 }

@@ -39,12 +39,13 @@ export async function createPage(ctx) {
 
     ctx.render(createTemplate(createSubmitHandler(onCreate)));
 
-    async function onCreate({brand, model, description, year, imageUrl, price }){
+    async function onCreate({brand,model,description,year,imageUrl,price}){
 
-        if([brand, model, description, year, imageUrl, price ].some(l => l=='')){
+        if([brand,model,description,year,imageUrl,price].some(l => l=='')){
             return alert('All fields are required');
         }
-
+        year = Number(year);
+        price = Number(price);
         if(year <= 0 ){
             return alert('Invalid year! Year must be positive number!');
         }
@@ -52,7 +53,7 @@ export async function createPage(ctx) {
         if( price <= 0){
             return alert('Inavild price! Price must be a positive number!');
         }
-        await createListing({brand, model, description, year, imageUrl, price });
+        await createListing({brand,model,description,year,imageUrl,price});
 
         ctx.page.redirect('/listings');
     }

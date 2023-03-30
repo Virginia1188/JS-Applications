@@ -5,7 +5,7 @@ export const layoutTemplate = (userData, content) => html`
     <nav>
         <a class="active" href="/">Home</a>
         <a href="/listings">All Listings</a>
-        <a href="/byyear">By Year</a>
+        <a href="/search">By Year</a>
 
         ${userData ? html`
         <div id="profile">

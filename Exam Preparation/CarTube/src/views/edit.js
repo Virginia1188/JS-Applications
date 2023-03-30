@@ -44,12 +44,13 @@ export async function editPage(ctx) {
 
     ctx.render(editTemplate(car,createSubmitHandler(onEdit)));
 
-    async function onEdit({brand, model, description, year, imageUrl, price }){
+    async function onEdit({brand,model,description,year,imageUrl,price}){
 
-        if([brand, model, description, year, imageUrl, price ].some(l => l=='')){
+        if([brand,model,description,year,imageUrl,price].some(l => l=='')){
             return alert('All fields are required');
         }
-
+        year = Number(year);
+        price = Number(price);
         if(year <= 0 ){
             return alert('Invalid year! Year must be positive number!');
         }
@@ -57,7 +58,7 @@ export async function editPage(ctx) {
         if( price <= 0){
             return alert('Inavild price! Price must be a positive number!');
         }
-        await editListing(id, {brand, model, description, year, imageUrl, price });
+        await editListing(id, {brand,model,description,year,imageUrl,price});
 
         ctx.page.redirect(`/listings/${id}`);
     }
